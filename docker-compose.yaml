@@ -1,0 +1,61 @@
+version: "3.3"
+services:
+  registry-docker:
+    image: registry:2
+    container_name: registry-docker
+    restart: always
+    # env_file:
+    #   - proxy_auth.env
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
+
+  registry-k8s.gcr:
+    image: registry:2
+    container_name: registry-k8s.gcr
+    restart: always
+    # env_file:
+    #   - proxy_auth.env
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://k8s.gcr.io
+  registry-quay:
+    image: registry:2.5
+    container_name: registry-quay
+    restart: always
+    # env_file:
+    #   - proxy_auth.env
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://quay.io
+
+  registry-gcr:
+    image: registry:2
+    container_name: registry-gcr
+    restart: always
+    # env_file:
+    #   - proxy_auth.env
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://gcr.io
+
+  registry-ghcr:
+    image: registry:2
+    container_name: registry-ghcr
+    restart: always
+    # env_file:
+    #   - proxy_auth.env
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://ghcr.io
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    restart: always
+    depends_on:
+      - registry-docker
+      - registry-k8s.gcr
+      - registry-quay
+      - registry-gcr
+      - registry-ghcr
+    ports:
+      - 80:80
+        #   - 443:443
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
