@@ -19,6 +19,10 @@ docker login registry-docker.example.com
 docker login registry-k8s.example.com
 # etc...
 ```
+### Change Auth Credentials
+```bash
+./change_auth.sh
+```
 
 ## Supported Repository
 - **`registry-1.docker.io`** as `registry-docker.example.com`
