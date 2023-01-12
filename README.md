@@ -17,7 +17,7 @@ docker pull registry-docker.example.com/curlimages/curl
 ```bash
 docker login registry-docker.example.com
 docker login registry-k8s.example.com
-# etc
+# etc...
 ```
 
 ## Supported Repository
