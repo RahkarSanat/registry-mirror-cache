@@ -56,6 +56,15 @@ services:
       - registry-ghcr
     ports:
       - 80:80
-        #   - 443:443
+      - 443:443
     volumes:
       - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+    networks:
+      - nginx_network
+  certbot:
+    image: m.docker-registry.ir/certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
