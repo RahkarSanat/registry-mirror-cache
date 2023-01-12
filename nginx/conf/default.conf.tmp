@@ -19,6 +19,7 @@ upstream ghcr {
   server registry-ghcr:5000;
 }
 
+
 map $reg_mirror $upstream_mirror {
   'docker' 'registry-docker:5000';
   'k8s' 'registry-k8s.gcr:5000';
@@ -33,7 +34,7 @@ map $upstream_http_docker_distribution_api_version $docker_distribution_api_vers
 
 server {
   listen 80;
-  server_name ~^registry-(?<reg_mirror>docker|k8s|quay|gcr|ghcr).kiz.ir;
+  server_name ~^registry-(?<reg_mirror>docker|k8s|quay|gcr|ghcr).<DOMAIN>;
 
   location /.well-known/acme-challenge/ {
     root /var/www/certbot;
@@ -43,25 +44,23 @@ server {
 
   chunked_transfer_encoding on;
 
-
   location / {
-    return 301 https://registry-$reg_mirror.kiz.ir$request_uri;
+    return 301 https://registry-$reg_mirror.<DOMAIN>$request_uri;
   }
 
 }
 
 server {
   listen 443 ssl;
-  server_name ~^registry-(?<reg_mirror>docker|k8s|quay|gcr|ghcr).kiz.ir;
+  server_name ~^registry-(?<reg_mirror>docker|k8s|quay|gcr|ghcr).<DOMAIN>;
 
   client_max_body_size 16384m;
 
   chunked_transfer_encoding on;
 
-  ssl_certificate /etc/nginx/ssl/live/registry-$reg_mirror.kiz.ir/fullchain.pem;
-  ssl_certificate_key /etc/nginx/ssl/live/registry-$reg_mirror.kiz.ir/privkey.pem;
+  ssl_certificate "/etc/nginx/ssl/live/<DOMAIN>/fullchain.pem";
+  ssl_certificate_key "/etc/nginx/ssl/live/<DOMAIN>/privkey.pem";
 
-  #location ~* (?<reg_mirror>docker|k8s|quay|gcr|ghcr)/(?<end>.+) {
   location / {
     # return 200 http://$upstream_mirror/$end;
     # Do not allow connections from docker 1.5 and earlier
@@ -71,8 +70,8 @@ server {
     }
 
     # To add basic authentication to v2 use auth_basic setting.
-    # auth_basic "Registry realm";
-    # auth_basic_user_file /etc/nginx/conf.d/nginx.htpasswd;
+    auth_basic "Registry realm";
+    auth_basic_user_file /etc/nginx/conf.d/nginx.htpasswd;
 
     ## If $docker_distribution_api_version is empty, the header is not added.
     ## See the map directive above where this variable is defined.

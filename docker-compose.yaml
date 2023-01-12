@@ -4,8 +4,6 @@ services:
     image: registry:2
     container_name: registry-docker
     restart: always
-    # env_file:
-    #   - proxy_auth.env
     environment:
       REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
 
@@ -13,16 +11,12 @@ services:
     image: registry:2
     container_name: registry-k8s.gcr
     restart: always
-    # env_file:
-    #   - proxy_auth.env
     environment:
       REGISTRY_PROXY_REMOTEURL: https://k8s.gcr.io
   registry-quay:
     image: registry:2.5
     container_name: registry-quay
     restart: always
-    # env_file:
-    #   - proxy_auth.env
     environment:
       REGISTRY_PROXY_REMOTEURL: https://quay.io
 
@@ -30,8 +24,6 @@ services:
     image: registry:2
     container_name: registry-gcr
     restart: always
-    # env_file:
-    #   - proxy_auth.env
     environment:
       REGISTRY_PROXY_REMOTEURL: https://gcr.io
 
@@ -39,8 +31,6 @@ services:
     image: registry:2
     container_name: registry-ghcr
     restart: always
-    # env_file:
-    #   - proxy_auth.env
     environment:
       REGISTRY_PROXY_REMOTEURL: https://ghcr.io
 
@@ -58,13 +48,14 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./nginx/conf/:/etc/nginx/conf.d/
       - ./certbot/www:/var/www/certbot/:ro
       - ./certbot/conf/:/etc/nginx/ssl/:ro
-    networks:
-      - nginx_network
+    command: /bin/sh -c "sed 's/<DOMAIN>/$DOMAIN/g' /etc/nginx/conf.d/default.conf.tmp > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+
   certbot:
-    image: m.docker-registry.ir/certbot/certbot:latest
+    image: certbot/certbot:latest
+    container_name: certbot
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
