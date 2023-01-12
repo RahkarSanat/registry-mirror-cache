@@ -1,63 +1,61 @@
 version: "3.3"
 services:
-  # registry-docker:
-  #   image: registry:2
-  #   container_name: registry-docker
-  #   restart: always
-  #   environment:
-  #     REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
+  registry-docker:
+    image: registry:2
+    container_name: registry-docker
+    restart: always
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
 
-  # registry-k8s.gcr:
-  #   image: registry:2
-  #   container_name: registry-k8s.gcr
-  #   restart: always
-  #   environment:
-  #     REGISTRY_PROXY_REMOTEURL: https://k8s.gcr.io
-  # registry-quay:
-  #   image: registry:2.5
-  #   container_name: registry-quay
-  #   restart: always
-  #   environment:
-  #     REGISTRY_PROXY_REMOTEURL: https://quay.io
+  registry-k8s.gcr:
+    image: registry:2
+    container_name: registry-k8s.gcr
+    restart: always
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://k8s.gcr.io
+  registry-quay:
+    image: registry:2.5
+    container_name: registry-quay
+    restart: always
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://quay.io
 
-  # registry-gcr:
-  #   image: registry:2
-  #   container_name: registry-gcr
-  #   restart: always
-  #   environment:
-  #     REGISTRY_PROXY_REMOTEURL: https://gcr.io
+  registry-gcr:
+    image: registry:2
+    container_name: registry-gcr
+    restart: always
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://gcr.io
 
-  # registry-ghcr:
-  #   image: registry:2
-  #   container_name: registry-ghcr
-  #   restart: always
-  #   environment:
-  #     REGISTRY_PROXY_REMOTEURL: https://ghcr.io
+  registry-ghcr:
+    image: registry:2
+    container_name: registry-ghcr
+    restart: always
+    environment:
+      REGISTRY_PROXY_REMOTEURL: https://ghcr.io
 
-  # nginx:
-  #   image: nginx:stable-alpine
-  #   container_name: nginx
-  #   restart: always
-  #   depends_on:
-  #     - registry-docker
-  #     - registry-k8s.gcr
-  #     - registry-quay
-  #     - registry-gcr
-  #     - registry-ghcr
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   volumes:
-  #     - ./nginx/conf/:/etc/nginx/conf.d/
-  #     - ./certbot/www:/var/www/certbot/:ro
-  #     - ./certbot/conf/:/etc/nginx/ssl/:ro
-  #   command: /bin/sh -c "sed 's/<DOMAIN>/$DOMAIN/g' /etc/nginx/conf.d/$TYPE.conf.tmp > /etc/nginx/conf.d/$TYPE.conf && nginx -g 'daemon off;'"
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    restart: always
+    depends_on:
+      - registry-docker
+      - registry-k8s.gcr
+      - registry-quay
+      - registry-gcr
+      - registry-ghcr
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+    command: /bin/sh -c "sed 's/<DOMAIN>/$DOMAIN/g' /etc/nginx/conf.d/$TYPE.conf.tmp > /etc/nginx/conf.d/$TYPE.conf && nginx -g 'daemon off;'"
 
   certbot:
-    image: registry-docker.kiz.ir/certbot/certbot:latest
+    image: certbot/certbot:latest
     container_name: certbot
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
-    # entrypoint: /bin/sh
-    command: certonly --preferred-challenges=dns --agree-tos --email info@$DOMAIN --manual -d *.$DOMAIN --server https://acme-v02.api.letsencrypt.org/directory
