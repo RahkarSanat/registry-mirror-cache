@@ -2,6 +2,8 @@
 It can be used ro bypass docker-hub & gcr limitations for iranian developers. just run this services on server with access to free internet.
 
 ## Usage
+
+### As Mirror
 Either pass the `--registry-mirror` option when starting `dockerd` manually, or edit `/etc/docker/daemon.json` and add the `registry-mirrors` key and value, to make the change persistent.
 ```json
 {
@@ -9,6 +11,7 @@ Either pass the `--registry-mirror` option when starting `dockerd` manually, or 
 }
 ```
 
+### Direct Pull
 >  You **must** enable **https** on installation if you want pull images without setting `registry-mirrors`, for example something like this:
 ``` bash
 docker pull registry-docker.example.com/curlimages/curl
