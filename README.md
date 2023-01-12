@@ -35,7 +35,7 @@ docker login registry-k8s.example.com
 ## installation
 ```bash
 # Just run 
-./install.sh # it will ask every thing needs...
+./install.sh # it will ask everything needs...
 ```
 --------------
 read more :
