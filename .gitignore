@@ -1,3 +1,4 @@
 .env
 nginx/conf/default.conf
 nginx/conf/nginx.htpasswd
+certbot/
